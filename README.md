@@ -65,7 +65,33 @@ discovery:
       - "sha256:<SHA String>"
 ```
 
-# Launch worker nodes.
+# Create Launch Template and launch ASG
+
+```bash
+#!/bin/bash
+set -ex
+
+sleep 20
+
+apt-get update -y
+
+mkdir -p /opt/SocialMediaInfra
+cd /opt/SocialMediaInfra
+
+git init
+git remote add origin https://github.com/artamim/SocialMediaInfra.git
+
+# Enable sparse checkout
+git sparse-checkout init --cone
+git sparse-checkout set NodeSetup
+
+# Pull only NodeSetup folder
+git pull origin main
+
+cd NodeSetup
+chmod +x config.sh
+bash config.sh > /var/log/nodesetup.log 2>&1
+```
 
 # Apply ArgoCD
 
@@ -104,7 +130,6 @@ kubectl port-forward svc/argocd-server -n argocd 8080:443 --address 0.0.0.0
 
 
 kubectl rollout restart deployment fastapi-app -n default
-kubectl apply -f application.yml
 kubectl logs -l app=fastapi-app -n default --tail=50
 
 
