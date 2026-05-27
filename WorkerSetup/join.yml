@@ -1,0 +1,14 @@
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: JoinConfiguration
+
+discovery:
+  bootstrapToken:
+    apiServerEndpoint: "172.31.46.9:6443"
+    token: "1pt4bk.07iog75a0kauzaod"
+    caCertHashes:
+      - "sha256:9f4c7acb2cb3d3217a6f6fca68f877d36cf6676c78cbd7944a8606bfa629893f"
+      
+#nodeRegistration:
+#  kubeletExtraArgs:
+#    - name: cloud-provider
+#      value: external

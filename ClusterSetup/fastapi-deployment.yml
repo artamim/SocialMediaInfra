@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-app
+  namespace: default
+  labels:
+    app: fastapi-app
+spec:
+  selector:
+    matchLabels:
+      app: fastapi-app
+  template:
+    metadata:
+      labels:
+        app: fastapi-app
+    spec:
+      imagePullSecrets:
+      - name: ecr-secret
+
+      containers:
+      - name: fastapi
+        image: 364420385429.dkr.ecr.ap-south-1.amazonaws.com/fastapi-app:6fcaac6d592915c69be71e4352da60ba89abbffa
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: appuser-secret
+              key: database_url
+        resources:
+          requests:
+            cpu: "150m"
+            memory: "256Mi"
+          limits:
+            cpu: "400m"
+            memory: "512Mi"

@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-init
+  namespace: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: init
+          image: postgres:16
+          envFrom:
+            - secretRef:
+                name: postgres-secret
+          command:
+            - /bin/bash
+            - -c
+            - |
+              echo "Waiting for Postgres to be ready..."
+              for i in {1..60}; do
+                if pg_isready -h postgres -U postgres -d appdb > /dev/null 2>&1; then
+                  echo "Postgres is ready!"
+                  break
+                fi
+                echo "Waiting... ($i/60)"
+                sleep 3
+              done
+
+              echo "Initializing database..."
+              PGPASSWORD=$POSTGRES_PASSWORD psql -h postgres -U postgres -d appdb <<EOF
+              CREATE TABLE IF NOT EXISTS test (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(100),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+              );
+
+              CREATE INDEX IF NOT EXISTS idx_test_name ON test(name);
+              EOF
+
+              echo "Database initialization completed!"
