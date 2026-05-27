@@ -83,14 +83,14 @@ git remote add origin https://github.com/artamim/SocialMediaInfra.git
 
 # Enable sparse checkout
 git sparse-checkout init --cone
-git sparse-checkout set NodeSetup
+git sparse-checkout set WorkerSetup
 
-# Pull only NodeSetup folder
+# Pull only WorkerSetup folder
 git pull origin main
 
-cd NodeSetup
+cd WorkerSetup
 chmod +x config.sh
-bash config.sh > /var/log/nodesetup.log 2>&1
+bash config.sh > /var/log/workersetup.log 2>&1
 ```
 
 # Apply ArgoCD
