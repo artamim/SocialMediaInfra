@@ -13,6 +13,7 @@ Production-grade Kubernetes cluster setup using **Kubeadm + ArgoCD** for a **Fas
 ## Prerequisite:
 Before working on kubernetes, we have to prepare the initial infra. The **infra/Kubeadm** module prepares 2 instances. Go to the folder and use the command below to launch the Database and Master instance.
 ```bash
+cd infra/Kubeadm
 terraform apply --auto-approve
 ```
 Both instances will have similar configuration except the fact that the database instances will be of higher specification. After 4-5 minutes, the initial setup of the instances will be done. The image of the worker instances can now be made from the master instance that will be used to create the template for the ASG. Apply the Script below as the user data that will pull the join yaml and do necessary configuration for the metrics server to work properly.
