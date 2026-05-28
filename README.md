@@ -1,5 +1,5 @@
 # Self-managed ArgoCD Kubernetes Cluster Setup
-Production-grade Kubernetes cluster setup using Kubeadm for a FastApi+PostgresDB CRUD infrastructure.
+Production-grade Kubernetes cluster setup using **Kubeadm + ArgoCD** for a **FastAPI + PostgreSQL CRUD** infrastructure with GitOps.
 
 ## Architecture Overview
 - Control Plane: Single control plane node (can be scaled later)
