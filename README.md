@@ -11,7 +11,7 @@ Production-grade Kubernetes cluster setup using Kubeadm for a FastApi+PostgresDB
 - Monitoring: Metrics Server
 
 ## Prerequisite:
-Before working on kubernetes, we have to prepare the intial infra. The **infra/Kubeadm** module prepares 2 instances. Go to the folder and use the command below to launch the Database and Master instance.
+Before working on kubernetes, we have to prepare the initial infra. The **infra/Kubeadm** module prepares 2 instances. Go to the folder and use the command below to launch the Database and Master instance.
 ```bash
 terraform apply --auto-approve
 ```
@@ -123,19 +123,20 @@ discovery:
       - "sha256:<SHA String>"
 ```
 
-After updating this Yaml and confirming the *"fastapi-deployment.yml"* file with the proper image tag, push it the the github repo.
-Lastly launch the ASG from **infra/ASG** folder using command below:
-```bahs
+After updating join.yml and fastapi-deployment.yml (with correct image tag), push the changes to GitHub.
+Then launch the Auto Scaling Group:
+```bash
+cd infra/ASG
 terraform apply --auto-approve
 ```
 
-## 5. ArgoCD Application
-Now everything has been setup. Apply the yml file below in the Master node. This will deploy in ArgoCD which will track any changes to the SocialMediaInfra/KubeadmSetup folder in the SocialMediaInfra github repo.
+## 4. ArgoCD Application
+Apply this Application manifest on the Control Plane node. It tells ArgoCD to monitor the KubeadmSetup folder in your repository.
 ```bash
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: myapp-argo-application
+  name: fastapi-argo-application
   namespace: argocd
 spec:
   project: default
@@ -157,7 +158,7 @@ spec:
       prune: true
 ```
 
-## 6. Post-Installation Commands
+## 5. Post-Installation Commands
 ### Get ArgoCD Admin Password
 ```bash
 kubectl -n argocd get secret argocd-initial-admin-secret \
@@ -167,14 +168,15 @@ kubectl -n argocd get secret argocd-initial-admin-secret \
 ```bash
 kubectl port-forward svc/argocd-server -n argocd 8080:443 --address 0.0.0.0
 ```
-### Restart Application
+### Restart Fastapi Pod
 ```bash
 kubectl rollout restart deployment fastapi-app -n default
 ```
-### View Logs
+### View Logs of Fastapi Pod
 ```bash
 kubectl logs -l app=fastapi-app -n default --tail=50 -f
 ```
 
-
-
+# Important Notes
+- Secrets: Make sure postgres-secret and appuser-secret have matching credentials (especially the password).
+- ECR Secret: The ECR pull secret expires after 12 hours. Consider implementing automatic rotation in production.
